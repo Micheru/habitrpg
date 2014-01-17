@@ -9,6 +9,9 @@ script(id='partials/options.settings.html', type="text/ng-template")
     li(ng-class="{ active: $state.includes('options.settings.export') }")
       a(ui-sref='options.settings.export')
         | Data Export
+    li(ng-class="{ active: $state.includes('options.settings.subscription') }")
+      a(ui-sref='options.settings.subscription')
+        | Subscription
 
   .tab-content
     .tab-pane.active
@@ -103,3 +106,33 @@ script(id='partials/options.settings.export.html', type="text/ng-template")
       Export User Data: &nbsp;
       a(href="/export/userdata.xml") (XML) &nbsp;
       a(href="/export/userdata.json") (JSON) &nbsp;
+
+script(id='partials/options.settings.subscription.html',type='text/ng-template')
+  div(ng-if='!user.purchased.plan.customerId')
+    table
+      tr
+        td
+          .npc_justin
+        td
+          .popover.static-popover.fade.right.in.wide-popover
+            .arrow
+            h3.popover-title
+              a(target='_blank', href='https://twitter.com/bowenNstuff') Justin
+            .popover-content
+              p <span class='label label-info'>$5 USD / Month</span> will give you:
+              ul.modal-indented-list
+                li +20 gems to your account, disables ads, donates to the developers.
+                li Let you purchase Gems with Gold (1 Gem costs 10 Gold). This lets you play with the peace of mind you're not "paying to win", as everything is now earned properly through your hard work.
+    br
+    .btn.btn-primary.btn-large(ng-click='showStripe(true)') Subscribe
+    small.muted PayPal coming soon.
+
+  div(ng-if='user.purchased.plan.customerId')
+    .well
+      div(style='font-size:22px')
+        i.icon-ok
+        | Subscribed
+      ul.muted
+        li +20 gems to your account, disables ads, donates to the developers.
+        li Let you purchase Gems with Gold (1 Gem costs 10 Gold). This lets you play with the peace of mind you're not "paying to win", as everything is now earned properly through your hard work.
+    .btn.btn-small.btn-danger(ng-click='cancelSubscription()') Cancel Subscription

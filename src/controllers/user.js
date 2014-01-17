@@ -257,6 +257,8 @@ api.addTenGems = function(req, res) {
   })
 }
 
+// TODO delete plan
+
 /*
  Setup Stripe response when posting payment
  */
@@ -264,26 +266,60 @@ api.buyGems = function(req, res) {
   var api_key = nconf.get('STRIPE_API_KEY');
   var stripe = require("stripe")(api_key);
   var token = req.body.id;
-  // console.dir {token:token, req:req}, 'stripe'
+  var user = res.locals.user;
 
   async.waterfall([
     function(cb){
-      stripe.charges.create({
-        amount: "500", // $5
-        currency: "usd",
-        card: token
-      }, cb);
+      if (req.query.plan) {
+        stripe.customers.create({
+          email: req.body.email,
+          metadata: {uuid: res.locals.user._id},
+          card: token,
+          plan: req.query.plan,
+        }, cb);
+      } else {
+        stripe.charges.create({
+          amount: "500", // $5
+          currency: "usd",
+          card: token
+        }, cb);
+      }
     },
     function(response, cb) {
-      res.locals.user.balance += 5;
-      res.locals.user.purchased.ads = true;
-      res.locals.user.save(cb);
+      user.balance += 5;
+      user.purchased.ads = true;
+      if (req.query.plan)
+        user.purchased.plan = {planId:'basic', customerId: response.id, date: new Date};
+      user.save(cb);
     }
   ], function(err, saved){
     if (err) return res.send(500, err.toString()); // don't json this, let toString() handle errors
     res.send(200, saved);
   });
 };
+
+api.cancelSubscription = function(req, res) {
+  var api_key = nconf.get('STRIPE_API_KEY');
+  var stripe = require("stripe")(api_key);
+  var user = res.locals.user;
+  if (!user.purchased.plan.customerId)
+    return res.json(401, {err: "User does not have a plan subscription"});
+
+  async.waterfall([
+    function(cb) {
+      stripe.customers.del(user.purchased.plan.customerId, cb);
+    },
+    function(response, cb) {
+      user.purchased.plan = {};
+      user.markModified('purchased.plan');
+      user.save(cb);
+    }
+  ], function(err, saved){
+    if (err) return res.send(500, err.toString()); // don't json this, let toString() handle errors
+    res.send(200, saved);
+  });
+
+}
 
 api.buyGemsPaypalIPN = function(req, res, next) {
   res.send(200);
