@@ -166,6 +166,9 @@ acceptablePUTPaths = _.reduce(require('./../models/user').schema.paths, function
   if (found) m[leaf]=true;
   return m;
 }, {})
+_.each('stats.gp'.split(' '), function(removePath){
+  delete acceptablePUTPaths[removePath];
+})
 
 /**
  * Update user
