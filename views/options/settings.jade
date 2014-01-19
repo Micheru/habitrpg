@@ -107,6 +107,11 @@ script(id='partials/options.settings.export.html', type="text/ng-template")
       a(href="/export/userdata.xml") (XML) &nbsp;
       a(href="/export/userdata.json") (JSON) &nbsp;
 
+script(id='partials/options.settings.subscription.perks.html',type='text/ng-template')
+  li +20 gems to your account, disables ads, donates to the developers.
+  li Let you purchase Gems with Gold (1 Gem costs 10 Gold). This lets you play with the peace of mind you're not "paying to win", as everything is now earned properly through your hard work.
+  li Retain full history entries for later export (non-subscriber histories get consolidated for database optimization)
+
 script(id='partials/options.settings.subscription.html',type='text/ng-template')
   div(ng-if='!user.purchased.plan.customerId')
     table
@@ -121,8 +126,7 @@ script(id='partials/options.settings.subscription.html',type='text/ng-template')
             .popover-content
               p <span class='label label-info'>$5 USD / Month</span> will give you:
               ul.modal-indented-list
-                li +20 gems to your account, disables ads, donates to the developers.
-                li Let you purchase Gems with Gold (1 Gem costs 10 Gold). This lets you play with the peace of mind you're not "paying to win", as everything is now earned properly through your hard work.
+                div(ng-include="'partials/options.settings.subscription.perks.html'")
     br
     .btn.btn-primary.btn-large(ng-click='showStripe(true)') Subscribe
     small.muted PayPal coming soon.
@@ -133,6 +137,5 @@ script(id='partials/options.settings.subscription.html',type='text/ng-template')
         i.icon-ok
         | Subscribed
       ul.muted
-        li +20 gems to your account, disables ads, donates to the developers.
-        li Let you purchase Gems with Gold (1 Gem costs 10 Gold). This lets you play with the peace of mind you're not "paying to win", as everything is now earned properly through your hard work.
+        div(ng-include="'partials/options.settings.subscription.perks.html'")
     .btn.btn-small.btn-danger(ng-click='cancelSubscription()') Cancel Subscription
